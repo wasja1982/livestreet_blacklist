@@ -64,6 +64,25 @@ class PluginBlacklist extends Plugin {
         return false;
     }
 
+    static function check_fspamlist_com($sMail) {
+        $aParams = array(
+            'json' => true,
+            'key' => Config::Get('plugin.blacklist.key_fspamlist_com'),
+            'spammer' => $sMail,
+        );
+        $sUrl = 'http://www.fspamlist.com/api.php' . '?' . urldecode(http_build_query($aParams));
+        $sAnswer = @file_get_contents($sUrl);
+        $aInfo = json_decode($sAnswer, true);
+        if (count($aInfo)) {
+            foreach ($aInfo as $aItem) {
+                if (isset($aItem['isspammer'])) {
+                    return $aItem['isspammer'];
+                }
+            }
+        }
+        return false;
+    }
+
     static function blackMail($sMail) {
         if (empty($sMail)) {
             return false;
@@ -74,6 +93,9 @@ class PluginBlacklist extends Plugin {
         }
         if (!$bResult && Config::Get('plugin.blacklist.use_botscout_com')) {
             $bResult = PluginBlacklist::check_botscout_com($sMail);
+        }
+        if (!$bResult && Config::Get('plugin.blacklist.use_fspamlist_com')) {
+            $bResult = PluginBlacklist::check_fspamlist_com($sMail);
         }
         return $bResult;
     }

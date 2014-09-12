@@ -14,6 +14,10 @@
 
 3) $config['key_botscout_com'] - Ключ для сайта botscout.com (http://botscout.com/getkey.htm).
 
+4) $config['use_fspamlist_com'] - Использовать базу сайта fspamlist.com. По умолчанию включено (true).
+
+5) $config['key_fspamlist_com'] - Ключ для сайта fspamlist.com (http://fspamlist.com/index.php?c=register).
+
 
 
 УСТАНОВКА

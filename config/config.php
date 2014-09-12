@@ -18,5 +18,11 @@ $config['use_botscout_com']=true;
 // Ключ для сайта botscout.com - http://botscout.com/getkey.htm
 $config['key_botscout_com']='xxxxxxxxxxxxxxx';
 
+// Использовать базу сайта fspamlist.com
+$config['use_fspamlist_com']=true;
+
+// Ключ для сайта fspamlist.com - http://fspamlist.com/index.php?c=register
+$config['key_fspamlist_com']='xxxxxxxxxxxxxxx';
+
 return $config;
 ?>
