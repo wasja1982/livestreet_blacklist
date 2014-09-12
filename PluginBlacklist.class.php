@@ -35,10 +35,7 @@ class PluginBlacklist extends Plugin {
     public function Init() {
     }
 
-    static function blackMail($sMail) {
-        if (empty($sMail)) {
-            return false;
-        }
+    static function check_stopforumspam_org($sMail) {
         $aParams = array(
             'f' => 'json',
             'email' => $sMail,
@@ -52,6 +49,33 @@ class PluginBlacklist extends Plugin {
             }
         }
         return false;
+    }
+
+    static function check_botscout_com($sMail) {
+        $aParams = array(
+            'key' => Config::Get('plugin.blacklist.key_botscout_com'),
+            'mail' => $sMail,
+        );
+        $sUrl = 'http://botscout.com/test/' . '?' . urldecode(http_build_query($aParams));
+        $sAnswer = @file_get_contents($sUrl);
+        if ($sAnswer && substr($sAnswer, 0, 1) === 'Y') {
+            return true;
+        }
+        return false;
+    }
+
+    static function blackMail($sMail) {
+        if (empty($sMail)) {
+            return false;
+        }
+        $bResult = false;
+        if (Config::Get('plugin.blacklist.use_stopforumspam_org')) {
+            $bResult = PluginBlacklist::check_stopforumspam_org($sMail);
+        }
+        if (!$bResult && Config::Get('plugin.blacklist.use_botscout_com')) {
+            $bResult = PluginBlacklist::check_botscout_com($sMail);
+        }
+        return $bResult;
     }
 }
 ?>
