@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+	<name>
+		<lang name="default">Blacklist</lang>
+		<lang name="russian">Черный список</lang>
+	</name>
+	<author>
+        <lang name="default">Alexandr Verenik</lang>
+        <lang name="russian">Александр Вереник</lang>
+	</author>
+	<homepage>https://github.com/wasja1982/livestreet_blacklist</homepage>
+	<version>1.0.0</version>
+	<requires>
+		<livestreet>1.0.3</livestreet>
+		<plugins>
+		</plugins>
+	</requires>
+	<description>
+		<lang name="default">Blacklist</lang>
+		<lang name="russian">Проверка E-Mail пользователей на наличие в базах спамеров.</lang>
+	</description>
+</plugin>
