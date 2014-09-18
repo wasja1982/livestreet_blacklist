@@ -27,5 +27,11 @@ $config['key_fspamlist_com']='xxxxxxxxxxxxxxx';
 // Проверять e-mail при авторизации
 $config['check_authorization']=true;
 
+// Белый список доменов
+$config['whitelist_domains']=array();
+
+// Черный список доменов
+$config['blacklist_domains']=array();
+
 return $config;
 ?>

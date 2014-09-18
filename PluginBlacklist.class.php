@@ -36,6 +36,18 @@ class PluginBlacklist extends Plugin {
     public function Init() {
     }
 
+    static function check_whitelist_domains($sMail) {
+        $aMail = explode("@", $sMail);
+        $sDomain = (count($aMail) > 1 ? $aMail[1] : '');
+        return in_array(strtolower($sDomain), Config::Get('plugin.blacklist.whitelist_domains'));
+    }
+
+    static function check_blacklist_domains($sMail) {
+        $aMail = explode("@", $sMail);
+        $sDomain = (count($aMail) > 1 ? $aMail[1] : '');
+        return in_array(strtolower($sDomain), Config::Get('plugin.blacklist.blacklist_domains'));
+    }
+
     static function check_stopforumspam_org($sMail) {
         $aParams = array(
             'f' => 'json',
@@ -87,6 +99,12 @@ class PluginBlacklist extends Plugin {
     static function blackMail($sMail) {
         if (empty($sMail)) {
             return false;
+        }
+        if (PluginBlacklist::check_whitelist_domains($sMail)) {
+            return false;
+        }
+        if (PluginBlacklist::check_blacklist_domains($sMail)) {
+            return true;
         }
         $bResult = false;
         if (Config::Get('plugin.blacklist.use_stopforumspam_org')) {
