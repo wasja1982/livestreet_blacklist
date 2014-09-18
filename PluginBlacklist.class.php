@@ -20,6 +20,7 @@ class PluginBlacklist extends Plugin {
 
     protected $aInherits = array(
         'entity' => array('ModuleUser_EntityUser'),
+        'module' => array('ModuleUser'),
     );
 
     /**

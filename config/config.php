@@ -24,5 +24,8 @@ $config['use_fspamlist_com']=true;
 // Ключ для сайта fspamlist.com - http://fspamlist.com/index.php?c=register
 $config['key_fspamlist_com']='xxxxxxxxxxxxxxx';
 
+// Проверять e-mail при авторизации
+$config['check_authorization']=true;
+
 return $config;
 ?>

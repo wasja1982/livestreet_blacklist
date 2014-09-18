@@ -18,6 +18,8 @@
 
 5) $config['key_fspamlist_com'] - Ключ для сайта fspamlist.com (http://fspamlist.com/index.php?c=register).
 
+6) $config['check_authorization'] - Проверять e-mail при авторизации. По умолчанию включено (true).
+
 
 
 УСТАНОВКА
