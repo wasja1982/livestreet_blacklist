@@ -2,7 +2,7 @@
 /**
  * Blacklist - проверка E-Mail пользователей на наличие в базах спамеров.
  *
- * Версия:	1.0.0
+ * Версия:	1.0.1
  * Автор:	Александр Вереник
  * Профиль:	http://livestreet.ru/profile/Wasja/
  * GitHub:	https://github.com/wasja1982/livestreet_blacklist
@@ -19,7 +19,7 @@ class PluginBlacklist_ModuleUser extends PluginBlacklist_Inherit_ModuleUser {
      * @return bool
      */
     public function Authorization(ModuleUser_EntityUser $oUser,$bRemember=true,$sKey=null) {
-        if (!Config::Get('plugin.blacklist.check_authorization') || ($oUser && !PluginBlacklist::blackMail($oUser->getMail()))) {
+        if (!Config::Get('plugin.blacklist.check_authorization') || ($oUser && !$this->PluginBlacklist_ModuleBlacklist_blackMail($oUser->getMail()))) {
             return parent::Authorization($oUser, $bRemember, $sKey);
         }
 		$this->Message_AddErrorSingle($this->Lang_Get('plugin.blacklist.mail_in_blacklist'));
