@@ -9,6 +9,12 @@
  *
  **/
 
+// Дополнительно проверять IP
+$config['check_ip']=true;
+
+// Строгая проверка IP (e-mail и IP должны быть в базе одновременно)
+$config['check_ip_exact']=false;
+
 // Использовать базу сайта stopforumspam.org
 $config['use_stopforumspam_org']=true;
 
