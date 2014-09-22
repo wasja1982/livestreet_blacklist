@@ -19,7 +19,7 @@ class PluginBlacklist_ModuleUser extends PluginBlacklist_Inherit_ModuleUser {
      * @return bool
      */
     public function Authorization(ModuleUser_EntityUser $oUser,$bRemember=true,$sKey=null) {
-        if (!Config::Get('plugin.blacklist.check_authorization') || ($oUser && !$this->PluginBlacklist_ModuleBlacklist_blackMail($oUser->getMail()))) {
+        if (!Config::Get('plugin.blacklist.check_authorization') || ($oUser && !$this->PluginBlacklist_ModuleBlacklist_blackMail($oUser->getMail(), $oUser->getLogin()))) {
             return parent::Authorization($oUser, $bRemember, $sKey);
         }
 		$this->Message_AddErrorSingle($this->Lang_Get('plugin.blacklist.mail_in_blacklist'));

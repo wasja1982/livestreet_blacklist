@@ -25,6 +25,14 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return in_array(strtolower($sDomain), Config::Get('plugin.blacklist.blacklist_domains'));
     }
 
+    public function check_whitelist_users_mail($sMail) {
+        return in_array(strtolower($sMail), Config::Get('plugin.blacklist.whitelist_users_mail'));
+    }
+
+    public function check_whitelist_users_name($sName) {
+        return in_array(strtolower($sName), Config::Get('plugin.blacklist.whitelist_users_name'));
+    }
+
     public function check_stopforumspam_org($sMail, $sIp) {
         $aParams = array(
             'f' => 'json',
@@ -121,11 +129,11 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return false;
     }
 
-    public function blackMail($sMail) {
+    public function blackMail($sMail, $sName = null) {
         if (empty($sMail)) {
             return false;
         }
-        if ($this->check_whitelist_domains($sMail)) {
+        if ($this->check_whitelist_users_mail($sMail) || (!empty($sName) && $this->check_whitelist_users_name($sName)) || $this->check_whitelist_domains($sMail)) {
             return false;
         }
         if ($this->check_blacklist_domains($sMail)) {

@@ -39,5 +39,11 @@ $config['whitelist_domains']=array();
 // Черный список доменов
 $config['blacklist_domains']=array();
 
+// Белый список пользователей (логины)
+$config['whitelist_users_name']=array();
+
+// Белый список пользователей (e-mail)
+$config['whitelist_users_mail']=array();
+
 return $config;
 ?>
