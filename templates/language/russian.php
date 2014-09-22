@@ -13,7 +13,8 @@
  * Русский языковой файл
  */
 return array(
-    'mail_in_blacklist' => 'Этот e-mail занесен в черный список.',
+    'user_in_blacklist' => 'Ваш e-mail или IP-адрес занесены в черный список.',
+    'user_in_exact_blacklist' => 'Ваши e-mail и IP-адрес занесены в черный список.',
 );
 
 ?>

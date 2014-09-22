@@ -21,7 +21,7 @@ class PluginBlacklist_ModuleUser_EntityUser extends PluginBlacklist_Inherit_Modu
         if (!$this->PluginBlacklist_ModuleBlacklist_blackMail($sValue)) {
             return parent::ValidateMailExists($sValue,$aParams);
         }
-        return $this->Lang_Get('plugin.blacklist.mail_in_blacklist');
+        return $this->Lang_Get(Config::Get('plugin.blacklist.check_ip_exact') ? 'plugin.blacklist.user_in_exact_blacklist' : 'plugin.blacklist.user_in_blacklist');
     }
 }
 ?>
