@@ -22,7 +22,8 @@ class PluginBlacklist_ModuleBlacklist extends Module {
     public function check_blacklist_domains($sMail) {
         $aMail = explode("@", $sMail);
         $sDomain = (count($aMail) > 1 ? $aMail[1] : '');
-        return in_array(strtolower($sDomain), Config::Get('plugin.blacklist.blacklist_domains'));
+        $aDomains = Config::Get('plugin.blacklist.blacklist_domains');
+        return (in_array('*', $aDomains) || in_array(strtolower($sDomain), $aDomains));
     }
 
     public function check_whitelist_users_mail($sMail) {
