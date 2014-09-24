@@ -48,5 +48,8 @@ $config['whitelist_users_name']=array();
 // Белый список пользователей (e-mail)
 $config['whitelist_users_mail']=array();
 
+// Белый список пользователей (IP)
+$config['whitelist_users_ip']=array();
+
 return $config;
 ?>

@@ -34,6 +34,8 @@
 
 13) $config['whitelist_users_mail'] - Белый список пользователей (e-mail).
 
+13) $config['whitelist_users_ip'] - Белый список пользователей (IP-адреса).
+
 
 
 УСТАНОВКА

@@ -34,6 +34,10 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return in_array(strtolower($sName), Config::Get('plugin.blacklist.whitelist_users_name'));
     }
 
+    public function check_whitelist_users_ip($sIp) {
+        return in_array(strtolower($sIp), Config::Get('plugin.blacklist.whitelist_users_ip'));
+    }
+
     public function check_stopforumspam_org($sMail, $sIp) {
         $aParams = array(
             'f' => 'json',
@@ -166,7 +170,11 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         if (empty($sMail)) {
             return false;
         }
-        if ($this->check_whitelist_users_mail($sMail) || (!empty($sName) && $this->check_whitelist_users_name($sName)) || $this->check_whitelist_domains($sMail)) {
+        $sIp = func_getIp();
+        if ($this->check_whitelist_users_mail($sMail) ||
+            (!empty($sName) && $this->check_whitelist_users_name($sName)) ||
+            (!empty($sIp) && $this->check_whitelist_users_ip($sIp)) || 
+            $this->check_whitelist_domains($sMail)) {
             return false;
         }
         if ($this->check_blacklist_domains($sMail)) {
@@ -175,7 +183,6 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         if (!Config::Get('plugin.blacklist.check_mail') && !Config::Get('plugin.blacklist.check_ip')) {
             return false;
         }
-        $sIp = func_getIp();
         $bResult = false;
         if (Config::Get('plugin.blacklist.use_stopforumspam_org')) {
             $bResult = $this->check_stopforumspam_org($sMail, $sIp);
