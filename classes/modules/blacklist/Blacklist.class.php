@@ -125,7 +125,11 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                     }
                 }
             }
-            return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
+            if ($bCheckIp) {
+                return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
+            } else {
+                return $bMail;
+            }
         }
         return false;
     }
