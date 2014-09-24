@@ -38,6 +38,18 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return in_array(strtolower($sIp), Config::Get('plugin.blacklist.whitelist_users_ip'));
     }
 
+    public function check_blacklist_users_mail($sMail) {
+        return in_array(strtolower($sMail), Config::Get('plugin.blacklist.blacklist_users_mail'));
+    }
+
+    public function check_blacklist_users_name($sName) {
+        return in_array(strtolower($sName), Config::Get('plugin.blacklist.blacklist_users_name'));
+    }
+
+    public function check_blacklist_users_ip($sIp) {
+        return in_array(strtolower($sIp), Config::Get('plugin.blacklist.blacklist_users_ip'));
+    }
+
     public function check_stopforumspam_org($sMail, $sIp) {
         $aParams = array(
             'f' => 'json',
@@ -51,7 +63,6 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             $aParams['ip'] = $sIp;
         }
         $sUrl = 'http://api.stopforumspam.org/api' . '?' . urldecode(http_build_query($aParams));
-        error_log($sUrl);
         $sAnswer = @file_get_contents($sUrl);
         $aInfo = json_decode($sAnswer, true);
         if (isset($aInfo['success']) && $aInfo['success']) {
@@ -94,7 +105,6 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             $aParams['multi'] = true;
         }
         $sUrl = 'http://botscout.com/test/' . '?' . urldecode(http_build_query($aParams));
-        error_log($sUrl);
         $sAnswer = @file_get_contents($sUrl);
         if ($sAnswer) {
             $aAnswer = explode('|', $sAnswer);
@@ -140,7 +150,6 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             return false;
         }
         $sUrl = 'http://www.fspamlist.com/api.php' . '?' . urldecode(http_build_query($aParams));
-        error_log($sUrl);
         $sAnswer = @file_get_contents($sUrl);
         $aInfo = json_decode($sAnswer, true);
         if (count($aInfo)) {
@@ -177,7 +186,10 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             $this->check_whitelist_domains($sMail)) {
             return false;
         }
-        if ($this->check_blacklist_domains($sMail)) {
+        if ($this->check_blacklist_users_mail($sMail) ||
+            (!empty($sName) && $this->check_blacklist_users_name($sName)) ||
+            (!empty($sIp) && $this->check_blacklist_users_ip($sIp)) ||
+            $this->check_blacklist_domains($sMail)) {
             return true;
         }
         if (!Config::Get('plugin.blacklist.check_mail') && !Config::Get('plugin.blacklist.check_ip')) {

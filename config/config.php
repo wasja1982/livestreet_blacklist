@@ -51,5 +51,14 @@ $config['whitelist_users_mail']=array();
 // Белый список пользователей (IP)
 $config['whitelist_users_ip']=array();
 
+// Черный список пользователей (логины)
+$config['blacklist_users_name']=array();
+
+// Черный список пользователей (e-mail)
+$config['blacklist_users_mail']=array();
+
+// Черный список пользователей (IP)
+$config['blacklist_users_ip']=array();
+
 return $config;
 ?>

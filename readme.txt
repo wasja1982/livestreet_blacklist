@@ -34,7 +34,13 @@
 
 13) $config['whitelist_users_mail'] - Белый список пользователей (e-mail).
 
-13) $config['whitelist_users_ip'] - Белый список пользователей (IP-адреса).
+14) $config['whitelist_users_ip'] - Белый список пользователей (IP-адреса).
+
+15) $config['blacklist_users_name'] - Черный список пользователей (логины). Проверяется только при авторизации.
+
+16) $config['blacklist_users_mail'] - Черный список пользователей (e-mail).
+
+17) $config['blacklist_users_ip'] - Черный список пользователей (IP-адреса).
 
 
 
