@@ -9,7 +9,10 @@
  *
  **/
 
-// Дополнительно проверять IP
+// Проверять e-mail по базам
+$config['check_mail']=true;
+
+// Проверять IP по базам
 $config['check_ip']=true;
 
 // Строгая проверка IP (e-mail и IP должны быть в базе одновременно)
@@ -30,7 +33,7 @@ $config['use_fspamlist_com']=true;
 // Ключ для сайта fspamlist.com - http://fspamlist.com/index.php?c=register
 $config['key_fspamlist_com']='xxxxxxxxxxxxxxx';
 
-// Проверять e-mail при авторизации
+// Проверять e-mail и IP при авторизации
 $config['check_authorization']=true;
 
 // Белый список доменов

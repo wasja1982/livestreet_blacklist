@@ -37,28 +37,38 @@ class PluginBlacklist_ModuleBlacklist extends Module {
     public function check_stopforumspam_org($sMail, $sIp) {
         $aParams = array(
             'f' => 'json',
-            'email' => $sMail,
         );
+        $bCheckMail = (Config::Get('plugin.blacklist.check_mail') && $sMail);
+        if ($bCheckMail) {
+            $aParams['email'] = $sMail;
+        }
         $bCheckIp = (Config::Get('plugin.blacklist.check_ip') && $sIp && $sIp !== '127.0.0.1');
         if ($bCheckIp) {
             $aParams['ip'] = $sIp;
         }
         $sUrl = 'http://api.stopforumspam.org/api' . '?' . urldecode(http_build_query($aParams));
+        error_log($sUrl);
         $sAnswer = @file_get_contents($sUrl);
         $aInfo = json_decode($sAnswer, true);
         if (isset($aInfo['success']) && $aInfo['success']) {
             $bMail = false;
-            if (isset($aInfo['email']) && isset($aInfo['email']['appears'])) {
-                $bMail = ($aInfo['email']['appears'] ? true : false);
+            $bIp = false;
+            if ($bCheckMail) {
+                if (isset($aInfo['email']) && isset($aInfo['email']['appears'])) {
+                    $bMail = ($aInfo['email']['appears'] ? true : false);
+                }
             }
             if ($bCheckIp) {
-                $bIp = false;
                 if (isset($aInfo['ip']) && isset($aInfo['ip']['appears'])) {
                     $bIp = ($aInfo['ip']['appears'] ? true : false);
                 }
-                return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
-            } else {
+            }
+            if ($bCheckMail && !$bCheckIp) {
                 return $bMail;
+            } else if (!$bCheckMail && $bCheckIp) {
+                return $bIp;
+            } else if ($bCheckMail && $bCheckIp) {
+                return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
             }
         }
         return false;
@@ -67,19 +77,25 @@ class PluginBlacklist_ModuleBlacklist extends Module {
     public function check_botscout_com($sMail, $sIp) {
         $aParams = array(
             'key' => Config::Get('plugin.blacklist.key_botscout_com'),
-            'mail' => $sMail,
         );
+        $bCheckMail = (Config::Get('plugin.blacklist.check_mail') && $sMail);
+        if ($bCheckMail) {
+            $aParams['mail'] = $sMail;
+        }
         $bCheckIp = (Config::Get('plugin.blacklist.check_ip') && $sIp && $sIp !== '127.0.0.1');
         if ($bCheckIp) {
             $aParams['ip'] = $sIp;
+        }
+        if ($bCheckMail && $bCheckIp) {
             $aParams['multi'] = true;
         }
         $sUrl = 'http://botscout.com/test/' . '?' . urldecode(http_build_query($aParams));
+        error_log($sUrl);
         $sAnswer = @file_get_contents($sUrl);
         if ($sAnswer) {
             $aAnswer = explode('|', $sAnswer);
             if (count($aAnswer) > 1 && $aAnswer[0] === 'Y') {
-                if ($bCheckIp && $aAnswer[1] === 'MULTI') {
+                if ($bCheckMail && $bCheckIp && $aAnswer[1] === 'MULTI') {
                     $bMail = false;
                     $bIp = false;
                     for ($i = 2; $i < count($aAnswer); $i += 2) {
@@ -104,13 +120,23 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         $aParams = array(
             'json' => true,
             'key' => Config::Get('plugin.blacklist.key_fspamlist_com'),
-            'spammer' => $sMail,
         );
+        $aSpammer = array();
+        $bCheckMail = (Config::Get('plugin.blacklist.check_mail') && $sMail);
+        if ($bCheckMail) {
+            $aSpammer[] = $sMail;
+        }
         $bCheckIp = (Config::Get('plugin.blacklist.check_ip') && $sIp && $sIp !== '127.0.0.1');
         if ($bCheckIp) {
-            $aParams['spammer'] = $sMail . ',' . $sIp;
+            $aSpammer[] = $sIp;
+        }
+        if ($bCheckMail || $bCheckIp) {
+            $aParams['spammer'] = implode(',', $aSpammer);
+        } else {
+            return false;
         }
         $sUrl = 'http://www.fspamlist.com/api.php' . '?' . urldecode(http_build_query($aParams));
+        error_log($sUrl);
         $sAnswer = @file_get_contents($sUrl);
         $aInfo = json_decode($sAnswer, true);
         if (count($aInfo)) {
@@ -118,17 +144,19 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             $bIp = false;
             foreach ($aInfo as $aItem) {
                 if (isset($aItem['spammer'])) {
-                    if ($aItem['spammer'] == $sMail) {
+                    if ($bCheckMail && $aItem['spammer'] == $sMail) {
                         $bMail = ((isset($aItem['isspammer']) && $aItem['isspammer']) ? true : false);
-                    } elseif ($aItem['spammer'] == $sIp) {
+                    } elseif ($bCheckIp && $aItem['spammer'] == $sIp) {
                         $bIp = ((isset($aItem['isspammer']) && $aItem['isspammer']) ? true : false);
                     }
                 }
             }
-            if ($bCheckIp) {
-                return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
-            } else {
+            if ($bCheckMail && !$bCheckIp) {
                 return $bMail;
+            } else if (!$bCheckMail && $bCheckIp) {
+                return $bIp;
+            } else if ($bCheckMail && $bCheckIp) {
+                return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
             }
         }
         return false;
@@ -143,6 +171,9 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         }
         if ($this->check_blacklist_domains($sMail)) {
             return true;
+        }
+        if (!Config::Get('plugin.blacklist.check_mail') && !Config::Get('plugin.blacklist.check_ip')) {
+            return false;
         }
         $sIp = func_getIp();
         $bResult = false;
