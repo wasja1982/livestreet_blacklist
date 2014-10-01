@@ -10,37 +10,41 @@
 Поддерживаемые директивы:
 1) $config['check_mail'] - Проверять e-mail по базам. По умолчанию включено (true).
 
-2) $config['check_ip'] - Проверять IP по базам. По умолчанию включено (true).
+2) $config['check_mail_limit'] - Порог для срабатывания проверки e-mail (не менее указанного значения).
 
-3) $config['check_ip_exact'] - Строгая проверка IP (e-mail и IP должны быть в базе одновременно). По умолчанию отлючено (false).
+3) $config['check_ip'] - Проверять IP по базам. По умолчанию включено (true).
 
-4) $config['use_stopforumspam_org'] - Использовать базу сайта stopforumspam.org. По умолчанию включено (true).
+4) $config['check_ip_limit'] - Порог для срабатывания проверки IP (не менее указанного значения).
 
-5) $config['use_botscout_com'] - Использовать базу сайта botscout.com. По умолчанию включено (true).
+5) $config['check_ip_exact'] - Строгая проверка IP (e-mail и IP должны быть в базе одновременно). По умолчанию отлючено (false).
 
-6) $config['key_botscout_com'] - Ключ для сайта botscout.com (http://botscout.com/getkey.htm).
+6) $config['use_stopforumspam_org'] - Использовать базу сайта stopforumspam.org. По умолчанию включено (true).
 
-7) $config['use_fspamlist_com'] - Использовать базу сайта fspamlist.com. По умолчанию включено (true).
+7) $config['use_botscout_com'] - Использовать базу сайта botscout.com. По умолчанию включено (true).
 
-8) $config['key_fspamlist_com'] - Ключ для сайта fspamlist.com (http://fspamlist.com/index.php?c=register).
+8) $config['key_botscout_com'] - Ключ для сайта botscout.com (http://botscout.com/getkey.htm).
 
-9) $config['check_authorization'] - Проверять e-mail при авторизации. По умолчанию включено (true).
+9) $config['use_fspamlist_com'] - Использовать базу сайта fspamlist.com. По умолчанию включено (true).
 
-10) $config['whitelist_domains'] - Белый список доменов (e-mail с этих доменов считаются доверенными и не проверяются).
+10) $config['key_fspamlist_com'] - Ключ для сайта fspamlist.com (http://fspamlist.com/index.php?c=register).
 
-11) $config['blacklist_domains'] - Черный список доменов (e-mail с этих доменов запрещены).
+11) $config['check_authorization'] - Проверять e-mail при авторизации. По умолчанию включено (true).
 
-12) $config['whitelist_users_name'] - Белый список пользователей (логины). Проверяется только при авторизации.
+12) $config['whitelist_domains'] - Белый список доменов (e-mail с этих доменов считаются доверенными и не проверяются).
 
-13) $config['whitelist_users_mail'] - Белый список пользователей (e-mail).
+13) $config['blacklist_domains'] - Черный список доменов (e-mail с этих доменов запрещены).
 
-14) $config['whitelist_users_ip'] - Белый список пользователей (IP-адреса).
+14) $config['whitelist_users_name'] - Белый список пользователей (логины). Проверяется только при авторизации.
 
-15) $config['blacklist_users_name'] - Черный список пользователей (логины). Проверяется только при авторизации.
+15) $config['whitelist_users_mail'] - Белый список пользователей (e-mail).
 
-16) $config['blacklist_users_mail'] - Черный список пользователей (e-mail).
+16) $config['whitelist_users_ip'] - Белый список пользователей (IP-адреса).
 
-17) $config['blacklist_users_ip'] - Черный список пользователей (IP-адреса).
+17) $config['blacklist_users_name'] - Черный список пользователей (логины). Проверяется только при авторизации.
+
+18) $config['blacklist_users_mail'] - Черный список пользователей (e-mail).
+
+19) $config['blacklist_users_ip'] - Черный список пользователей (IP-адреса).
 
 
 

@@ -12,8 +12,14 @@
 // Проверять e-mail по базам
 $config['check_mail']=true;
 
+// Порог для срабатывания проверки e-mail (не менее указанного значения)
+$config['check_mail_limit']=1;
+
 // Проверять IP по базам
 $config['check_ip']=true;
+
+// Порог для срабатывания проверки IP (не менее указанного значения)
+$config['check_ip_limit']=1;
 
 // Строгая проверка IP (e-mail и IP должны быть в базе одновременно)
 $config['check_ip_exact']=false;

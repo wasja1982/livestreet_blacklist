@@ -69,13 +69,13 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             $bMail = false;
             $bIp = false;
             if ($bCheckMail) {
-                if (isset($aInfo['email']) && isset($aInfo['email']['appears'])) {
-                    $bMail = ($aInfo['email']['appears'] ? true : false);
+                if (isset($aInfo['email']) && isset($aInfo['email']['appears']) && isset($aInfo['email']['frequency'])) {
+                    $bMail = ($aInfo['email']['appears'] ? ($aInfo['email']['frequency'] >= Config::Get('plugin.blacklist.check_mail_limit')) : false);
                 }
             }
             if ($bCheckIp) {
-                if (isset($aInfo['ip']) && isset($aInfo['ip']['appears'])) {
-                    $bIp = ($aInfo['ip']['appears'] ? true : false);
+                if (isset($aInfo['ip']) && isset($aInfo['ip']['appears']) && isset($aInfo['ip']['frequency'])) {
+                    $bIp = ($aInfo['ip']['appears'] ? ($aInfo['ip']['frequency'] >= Config::Get('plugin.blacklist.check_ip_limit')) : false);
                 }
             }
             if ($bCheckMail && !$bCheckIp) {
@@ -112,12 +112,14 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                 if ($bCheckMail && $bCheckIp && $aAnswer[1] === 'MULTI') {
                     $bMail = false;
                     $bIp = false;
+                    $iMailLimit = Config::Get('plugin.blacklist.check_mail_limit');
+                    $iIpLimit = Config::Get('plugin.blacklist.check_ip_limit');
                     for ($i = 2; $i < count($aAnswer); $i += 2) {
                         if (isset($aAnswer[$i]) && isset($aAnswer[$i+1])) {
-                            if ($aAnswer[$i] == 'MAIL' && $aAnswer[$i+1] > 0) {
-                                $bMail = true;
-                            } elseif ($aAnswer[$i] == 'IP' && $aAnswer[$i+1] > 0) {
-                                $bIp = true;
+                            if ($aAnswer[$i] == 'MAIL') {
+                                $bMail = ($aAnswer[$i+1] >= $iMailLimit);
+                            } elseif ($aAnswer[$i] == 'IP') {
+                                $bIp = ($aAnswer[$i+1] >= $iIpLimit);
                             }
                         }
                     }
@@ -155,12 +157,14 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         if (count($aInfo)) {
             $bMail = false;
             $bIp = false;
+            $iMailLimit = Config::Get('plugin.blacklist.check_mail_limit');
+            $iIpLimit = Config::Get('plugin.blacklist.check_ip_limit');
             foreach ($aInfo as $aItem) {
                 if (isset($aItem['spammer'])) {
                     if ($bCheckMail && $aItem['spammer'] == $sMail) {
-                        $bMail = ((isset($aItem['isspammer']) && $aItem['isspammer']) ? true : false);
+                        $bMail = ((isset($aItem['isspammer']) && isset($aItem['timesreported']) && $aItem['isspammer']) ? ($aItem['timesreported'] >= $iMailLimit) : false);
                     } elseif ($bCheckIp && $aItem['spammer'] == $sIp) {
-                        $bIp = ((isset($aItem['isspammer']) && $aItem['isspammer']) ? true : false);
+                        $bIp = ((isset($aItem['isspammer']) && isset($aItem['timesreported']) && $aItem['isspammer']) ? ($aItem['timesreported'] >= $iIpLimit) : false);
                     }
                 }
             }
