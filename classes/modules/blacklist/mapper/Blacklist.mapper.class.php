@@ -57,7 +57,7 @@ class PluginBlacklist_ModuleBlacklist_MapperBlacklist extends Mapper {
         if (!empty($sWhere)) {
             $sDate = date("Y-m-d H:00:00",time()-Config::Get('plugin.blacklist.recheck_time'));
             $sql = "SELECT * FROM " . Config::Get('db.table.blacklist') . " WHERE (" . $sWhere . ") AND date >=  '" . $sDate . "'";
-            if ($aRow = $this->oDb->select($sql,$sMail,'mail',$sDate,$iResult,$sDate,$iResult)) {
+            if ($aRow = $this->oDb->select($sql)) {
                 return $aRow;
             }
         }
