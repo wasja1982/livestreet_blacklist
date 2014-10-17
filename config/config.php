@@ -66,5 +66,10 @@ $config['blacklist_users_mail']=array();
 // Черный список пользователей (IP)
 $config['blacklist_users_ip']=array();
 
+// Время в секундах, в течении которого данные о предыдущей проверке пользователя считаются корректными
+$config['recheck_time']=60*60*24*1;
+
+Config::Set('db.table.blacklist', '___db.table.prefix___blacklist');
+
 return $config;
 ?>

@@ -27,6 +27,9 @@ class PluginBlacklist extends Plugin {
      * Активация плагина
      */
     public function Activate() {
+        if (!$this->isTableExists('prefix_blacklist')) {
+            $this->ExportSQL(dirname(__FILE__) . '/dump.sql');
+        }
         return true;
     }
 
