@@ -54,13 +54,11 @@ class PluginBlacklist_ModuleBlacklist extends Module {
     }
 
 
-    public function check_local_base($sMail, $sIp) {
+    public function check_local_base($sMail, $sIp, $bCheckMail, $bCheckIp) {
         $aWhere = array();
-        $bCheckMail = (Config::Get('plugin.blacklist.check_mail') && $sMail);
         if ($bCheckMail) {
             $aWhere['mail'] = $sMail;
         }
-        $bCheckIp = (Config::Get('plugin.blacklist.check_ip') && $sIp && $sIp !== '127.0.0.1');
         if ($bCheckIp) {
             $aWhere['ip'] = $sIp;
         }
@@ -91,15 +89,13 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return false;
     }
 
-    public function check_stopforumspam_org($sMail, $sIp) {
+    public function check_stopforumspam_org($sMail, $sIp, $bCheckMail, $bCheckIp) {
         $aParams = array(
             'f' => 'json',
         );
-        $bCheckMail = (Config::Get('plugin.blacklist.check_mail') && $sMail);
         if ($bCheckMail) {
             $aParams['email'] = $sMail;
         }
-        $bCheckIp = (Config::Get('plugin.blacklist.check_ip') && $sIp && $sIp !== '127.0.0.1');
         if ($bCheckIp) {
             $aParams['ip'] = $sIp;
         }
@@ -136,15 +132,13 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return false;
     }
 
-    public function check_botscout_com($sMail, $sIp) {
+    public function check_botscout_com($sMail, $sIp, $bCheckMail, $bCheckIp) {
         $aParams = array(
             'key' => Config::Get('plugin.blacklist.key_botscout_com'),
         );
-        $bCheckMail = (Config::Get('plugin.blacklist.check_mail') && $sMail);
         if ($bCheckMail) {
             $aParams['mail'] = $sMail;
         }
-        $bCheckIp = (Config::Get('plugin.blacklist.check_ip') && $sIp && $sIp !== '127.0.0.1');
         if ($bCheckIp) {
             $aParams['ip'] = $sIp;
         }
@@ -195,17 +189,15 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return false;
     }
 
-    public function check_fspamlist_com($sMail, $sIp) {
+    public function check_fspamlist_com($sMail, $sIp, $bCheckMail, $bCheckIp) {
         $aParams = array(
             'json' => true,
             'key' => Config::Get('plugin.blacklist.key_fspamlist_com'),
         );
         $aSpammer = array();
-        $bCheckMail = (Config::Get('plugin.blacklist.check_mail') && $sMail);
         if ($bCheckMail) {
             $aSpammer[] = $sMail;
         }
-        $bCheckIp = (Config::Get('plugin.blacklist.check_ip') && $sIp && $sIp !== '127.0.0.1');
         if ($bCheckIp) {
             $aSpammer[] = $sIp;
         }
@@ -267,15 +259,15 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         if (!$bCheckMail && !$bCheckIp) {
             return false;
         }
-        $bResult = $this->check_local_base($sMail, $sIp);
+        $bResult = $this->check_local_base($sMail, $sIp, $bCheckMail, $bCheckIp);
         if (!$bResult && Config::Get('plugin.blacklist.use_stopforumspam_org')) {
-            $bResult = $this->check_stopforumspam_org($sMail, $sIp);
+            $bResult = $this->check_stopforumspam_org($sMail, $sIp, $bCheckMail, $bCheckIp);
         }
         if (!$bResult && Config::Get('plugin.blacklist.use_botscout_com')) {
-            $bResult = $this->check_botscout_com($sMail, $sIp);
+            $bResult = $this->check_botscout_com($sMail, $sIp, $bCheckMail, $bCheckIp);
         }
         if (!$bResult && Config::Get('plugin.blacklist.use_fspamlist_com')) {
-            $bResult = $this->check_fspamlist_com($sMail, $sIp);
+            $bResult = $this->check_fspamlist_com($sMail, $sIp, $bCheckMail, $bCheckIp);
         }
         if (!$bResult) {
             if ($bCheckMail) {
