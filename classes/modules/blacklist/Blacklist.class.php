@@ -109,11 +109,11 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         if ($sAnswer) {
             $aAnswer = explode('|', $sAnswer);
             if (count($aAnswer) > 1 && $aAnswer[0] === 'Y') {
+                $bMail = false;
+                $bIp = false;
+                $iMailLimit = Config::Get('plugin.blacklist.check_mail_limit');
+                $iIpLimit = Config::Get('plugin.blacklist.check_ip_limit');
                 if ($bCheckMail && $bCheckIp && $aAnswer[1] === 'MULTI') {
-                    $bMail = false;
-                    $bIp = false;
-                    $iMailLimit = Config::Get('plugin.blacklist.check_mail_limit');
-                    $iIpLimit = Config::Get('plugin.blacklist.check_ip_limit');
                     for ($i = 2; $i < count($aAnswer); $i += 2) {
                         if (isset($aAnswer[$i]) && isset($aAnswer[$i+1])) {
                             if ($aAnswer[$i] == 'MAIL') {
@@ -123,9 +123,19 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                             }
                         }
                     }
+                } else if (count($aAnswer) == 3) {
+                    if ($bCheckMail && $aAnswer[1] === 'MAIL') {
+                        $bMail = ($aAnswer[2] >= $iMailLimit);
+                    } else if ($bCheckMail && $aAnswer[1] === 'IP') {
+                        $bIp = ($aAnswer[$i+1] >= $iIpLimit);
+                    }
+                }
+                if ($bCheckMail && !$bCheckIp) {
+                    return $bMail;
+                } else if (!$bCheckMail && $bCheckIp) {
+                    return $bIp;
+                } else if ($bCheckMail && $bCheckIp) {
                     return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
-                } else {
-                    return true;
                 }
             }
         }
