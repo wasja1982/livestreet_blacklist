@@ -180,17 +180,14 @@ class PluginBlacklist_ModuleBlacklist extends Module {
     }
 
     public function blackMail($sMail, $sName = null) {
-        if (empty($sMail)) {
-            return false;
-        }
         $sIp = func_getIp();
-        if ($this->check_whitelist_users_mail($sMail) ||
+        if ((!empty($sMail) && $this->check_whitelist_users_mail($sMail)) ||
             (!empty($sName) && $this->check_whitelist_users_name($sName)) ||
             (!empty($sIp) && $this->check_whitelist_users_ip($sIp)) || 
             $this->check_whitelist_domains($sMail)) {
             return false;
         }
-        if ($this->check_blacklist_users_mail($sMail) ||
+        if ((!empty($sMail) && $this->check_blacklist_users_mail($sMail)) ||
             (!empty($sName) && $this->check_blacklist_users_name($sName)) ||
             (!empty($sIp) && $this->check_blacklist_users_ip($sIp)) ||
             $this->check_blacklist_domains($sMail)) {
