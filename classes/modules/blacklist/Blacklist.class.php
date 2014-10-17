@@ -262,7 +262,9 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             $this->check_blacklist_domains($sMail)) {
             return true;
         }
-        if (!Config::Get('plugin.blacklist.check_mail') && !Config::Get('plugin.blacklist.check_ip')) {
+        $bCheckMail = (Config::Get('plugin.blacklist.check_mail') && $sMail);
+        $bCheckIp = (Config::Get('plugin.blacklist.check_ip') && $sIp && $sIp !== '127.0.0.1');
+        if (!$bCheckMail && !$bCheckIp) {
             return false;
         }
         $bResult = $this->check_local_base($sMail, $sIp);
