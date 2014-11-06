@@ -53,6 +53,20 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return in_array(strtolower($sIp), Config::Get('plugin.blacklist.blacklist_users_ip'));
     }
 
+    private function analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact) {
+        if (!is_array($aResult)) {
+            return false;
+        }
+        $bMail = (isset($aResult['mail']) ? $aResult['mail'] : false);
+        $bIp = (isset($aResult['mail']) ? $aResult['mail'] : false);
+        if ($bCheckMail && !$bCheckIp) {
+            return $bMail;
+        } else if (!$bCheckMail && $bCheckIp) {
+            return $bIp;
+        } else if ($bCheckMail && $bCheckIp) {
+            return ($bIpExact ? ($bMail && $bIp) : ($bMail || $bIp));
+        }
+    }
 
     public function check_local_base($sMail, $sIp, $bCheckMail, $bCheckIp) {
         $aWhere = array();
@@ -78,13 +92,10 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                     }
                 }
             }
-            if ($bCheckMail && !$bCheckIp) {
-                return $bMail;
-            } else if (!$bCheckMail && $bCheckIp) {
-                return $bIp;
-            } else if ($bCheckMail && $bCheckIp) {
-                return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
-            }
+            return array(
+                'mail' => $bMail,
+                'ip' => $bIp,
+            );
         }
         return false;
     }
@@ -115,19 +126,10 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                     $bIp = ($aInfo['ip']['appears'] ? ($aInfo['ip']['frequency'] >= Config::Get('plugin.blacklist.check_ip_limit')) : false);
                 }
             }
-            if ($bCheckMail && $bMail) {
-                $this->oMapper->AddMailResult($sMail, true);
-            }
-            if ($bCheckIp && $bIp) {
-                $this->oMapper->AddIpResult($sIp, true);
-            }
-            if ($bCheckMail && !$bCheckIp) {
-                return $bMail;
-            } else if (!$bCheckMail && $bCheckIp) {
-                return $bIp;
-            } else if ($bCheckMail && $bCheckIp) {
-                return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
-            }
+            return array(
+                'mail' => $bMail,
+                'ip' => $bIp,
+            );
         }
         return false;
     }
@@ -171,19 +173,10 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                         $bIp = ($aAnswer[$i+1] >= $iIpLimit);
                     }
                 }
-                if ($bCheckMail && $bMail) {
-                    $this->oMapper->AddMailResult($sMail, true);
-                }
-                if ($bCheckIp && $bIp) {
-                    $this->oMapper->AddIpResult($sIp, true);
-                }
-                if ($bCheckMail && !$bCheckIp) {
-                    return $bMail;
-                } else if (!$bCheckMail && $bCheckIp) {
-                    return $bIp;
-                } else if ($bCheckMail && $bCheckIp) {
-                    return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
-                }
+                return array(
+                    'mail' => $bMail,
+                    'ip' => $bIp,
+                );
             }
         }
         return false;
@@ -223,19 +216,10 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                     }
                 }
             }
-            if ($bCheckMail && $bMail) {
-                $this->oMapper->AddMailResult($sMail, true);
-            }
-            if ($bCheckIp && $bIp) {
-                $this->oMapper->AddIpResult($sIp, true);
-            }
-            if ($bCheckMail && !$bCheckIp) {
-                return $bMail;
-            } else if (!$bCheckMail && $bCheckIp) {
-                return $bIp;
-            } else if ($bCheckMail && $bCheckIp) {
-                return (Config::Get('plugin.blacklist.check_ip_exact') ? ($bMail && $bIp) : ($bMail || $bIp));
-            }
+            return array(
+                'mail' => $bMail,
+                'ip' => $bIp,
+            );
         }
         return false;
     }
@@ -259,23 +243,36 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         if (!$bCheckMail && !$bCheckIp) {
             return false;
         }
-        $bResult = $this->check_local_base($sMail, $sIp, $bCheckMail, $bCheckIp);
-        if (!$bResult && Config::Get('plugin.blacklist.use_stopforumspam_org')) {
-            $bResult = $this->check_stopforumspam_org($sMail, $sIp, $bCheckMail, $bCheckIp);
+        $bIpExact = Config::Get('plugin.blacklist.check_ip_exact');
+        if ($this->analyse_result($this->check_local_base($sMail, $sIp, $bCheckMail, $bCheckIp), $bCheckMail, $bCheckIp, $bIpExact)) {
+            return true;
+        }
+        $bMail = false;
+        $bIp = false;
+        if (Config::Get('plugin.blacklist.use_stopforumspam_org')) {
+            $aResult = $this->check_stopforumspam_org($sMail, $sIp, $bCheckMail, $bCheckIp);
+            $bMail |= (is_array($aResult) && isset($aResult['mail']) ? $aResult['mail'] : false);
+            $bIp |= (is_array($aResult) && isset($aResult['ip']) ? $aResult['ip'] : false);
+            $bResult = $this->analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact);
         }
         if (!$bResult && Config::Get('plugin.blacklist.use_botscout_com')) {
-            $bResult = $this->check_botscout_com($sMail, $sIp, $bCheckMail, $bCheckIp);
+            $aResult = $this->check_botscout_com($sMail, $sIp, $bCheckMail, $bCheckIp);
+            $bMail |= (is_array($aResult) && isset($aResult['mail']) ? $aResult['mail'] : false);
+            $bIp |= (is_array($aResult) && isset($aResult['ip']) ? $aResult['ip'] : false);
+            $bResult = $this->analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact);
         }
         if (!$bResult && Config::Get('plugin.blacklist.use_fspamlist_com')) {
-            $bResult = $this->check_fspamlist_com($sMail, $sIp, $bCheckMail, $bCheckIp);
+            $aResult = $this->check_fspamlist_com($sMail, $sIp, $bCheckMail, $bCheckIp);
+            $bMail |= (is_array($aResult) && isset($aResult['mail']) ? $aResult['mail'] : false);
+            $bIp |= (is_array($aResult) && isset($aResult['ip']) ? $aResult['ip'] : false);
+            $bResult = $this->analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact);
         }
-        if (!$bResult) {
-            if ($bCheckMail) {
-                $this->oMapper->AddMailResult($sMail, false);
-            }
-            if ($bCheckIp) {
-                $this->oMapper->AddIpResult($sIp, false);
-            }
+
+        if ($bCheckMail) {
+            $this->oMapper->AddMailResult($sMail, $bMail);
+        }
+        if ($bCheckIp) {
+            $this->oMapper->AddIpResult($sIp, $bIp);
         }
         return $bResult;
     }
