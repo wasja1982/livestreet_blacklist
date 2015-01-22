@@ -18,7 +18,7 @@
 
 5) $config['check_ip_exact'] - Строгая проверка IP (e-mail и IP должны быть в базе одновременно). По умолчанию отлючено (false).
 
-6) $config['use_stopforumspam_org'] - Использовать базу сайта stopforumspam.org. По умолчанию включено (true).
+6) $config['use_stopforumspam_com'] - Использовать базу сайта stopforumspam.com. По умолчанию включено (true).
 
 7) $config['use_botscout_com'] - Использовать базу сайта botscout.com. По умолчанию включено (true).
 

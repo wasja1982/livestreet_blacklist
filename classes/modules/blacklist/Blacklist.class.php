@@ -100,7 +100,7 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         return false;
     }
 
-    public function check_stopforumspam_org($sMail, $sIp, $bCheckMail, $bCheckIp) {
+    public function check_stopforumspam_com($sMail, $sIp, $bCheckMail, $bCheckIp) {
         $aParams = array(
             'f' => 'json',
         );
@@ -249,8 +249,8 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         }
         $bMail = false;
         $bIp = false;
-        if (Config::Get('plugin.blacklist.use_stopforumspam_org')) {
-            $aResult = $this->check_stopforumspam_org($sMail, $sIp, $bCheckMail, $bCheckIp);
+        if (Config::Get('plugin.blacklist.use_stopforumspam_com')) {
+            $aResult = $this->check_stopforumspam_com($sMail, $sIp, $bCheckMail, $bCheckIp);
             $bMail |= (is_array($aResult) && isset($aResult['mail']) ? $aResult['mail'] : false);
             $bIp |= (is_array($aResult) && isset($aResult['ip']) ? $aResult['ip'] : false);
             $bResult = $this->analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact);

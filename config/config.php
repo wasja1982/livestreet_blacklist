@@ -24,8 +24,8 @@ $config['check_ip_limit']=1;
 // Строгая проверка IP (e-mail и IP должны быть в базе одновременно)
 $config['check_ip_exact']=false;
 
-// Использовать базу сайта stopforumspam.org
-$config['use_stopforumspam_org']=true;
+// Использовать базу сайта stopforumspam.com
+$config['use_stopforumspam_com']=true;
 
 // Использовать базу сайта botscout.com
 $config['use_botscout_com']=true;
