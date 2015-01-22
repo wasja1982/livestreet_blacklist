@@ -207,7 +207,7 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             return false;
         }
         $bResult = false;
-        if (Config::Get('plugin.blacklist.use_stopforumspam_org')) {
+        if (Config::Get('plugin.blacklist.use_stopforumspam_com')) {
             $bResult = $this->check_stopforumspam_org($sMail, $sIp);
         }
         if (!$bResult && Config::Get('plugin.blacklist.use_botscout_com')) {
