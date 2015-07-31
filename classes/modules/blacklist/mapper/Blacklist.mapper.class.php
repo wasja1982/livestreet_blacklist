@@ -10,35 +10,35 @@
  **/
 
 class PluginBlacklist_ModuleBlacklist_MapperBlacklist extends Mapper {
-    public function AddMailResult($sMail, $bResult) {
+    public function AddMailResult($sMail, $bResult, $iService) {
         $sDate = date("Y-m-d H:i:s");
         $iResult = ($bResult ? 1 : 0);
         $sql = "INSERT INTO " . Config::Get('db.table.blacklist') . "
-                    (content, type, date, result)
+                    (content, type, service, date, result)
                 VALUES
-                    (?, ?, ?, ?d)
+                    (?, ?, ?d, ?, ?d)
                 ON DUPLICATE KEY UPDATE
                     date = ?,
                     result = ?d
                 ";
-        if ($this->oDb->query($sql,$sMail,'mail',$sDate,$iResult,$sDate,$iResult)) {
+        if ($this->oDb->query($sql,$sMail,'mail',$iService,$sDate,$iResult,$sDate,$iResult)) {
             return true;
         }
         return false;
     }
 
-    public function AddIpResult($sIp, $bResult) {
+    public function AddIpResult($sIp, $bResult, $iService) {
         $sDate = date("Y-m-d H:i:s");
         $iResult = ($bResult ? 1 : 0);
         $sql = "INSERT INTO " . Config::Get('db.table.blacklist') . "
-                    (content, type, date, result)
+                    (content, type, service, date, result)
                 VALUES
-                    (?, ?, ?, ?d)
+                    (?, ?, ?d, ?, ?d)
                 ON DUPLICATE KEY UPDATE
                     date = ?,
                     result = ?d
                 ";
-        if ($this->oDb->query($sql,$sIp,'ip',$sDate,$iResult,$sDate,$iResult)) {
+        if ($this->oDb->query($sql,$sIp,'ip',$iService,$sDate,$iResult,$sDate,$iResult)) {
             return true;
         }
         return false;
