@@ -90,15 +90,22 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             foreach ($aInfo as $aItem) {
                 if (isset($aItem['content'])) {
                     if ($bCheckMail && $aItem['content'] == $sMail) {
-                        $bMail = ((isset($aItem['result']) && $aItem['result']) ? true : false);
+                        $bMail |= ((isset($aItem['result']) && $aItem['result']) ? true : false);
                     } elseif ($bCheckIp && $aItem['content'] == $sIp) {
-                        $bIp = ((isset($aItem['result']) && $aItem['result']) ? true : false);
+                        $bIp |= ((isset($aItem['result']) && $aItem['result']) ? true : false);
                     }
                 }
             }
 
             // TODO: Проверка каждого из сервисов по отдельности
-
+/*
+            $aCache = array();
+            foreach ($aInfo as $aItem) {
+                if (isset($aItem['type']) && isset($aItem['service'])) {
+                    $aCache[$aItem['service']][$aItem['type']] = ((isset($aItem['result']) && $aItem['result']) ? true : false);
+                }
+            }
+ */
             return array(
                 'mail' => $bMail,
                 'ip' => $bIp,
