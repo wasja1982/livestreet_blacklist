@@ -9,12 +9,17 @@
  *
  **/
 
+define('DEBUG', false);
+
 class PluginBlacklist_ModuleBlacklist extends Module {
     protected $oMapper;
 
     const SERVICE_STOPFORUMSPAM_COM = 1;
     const SERVICE_BOTSCOUT_COM = 2;
     const SERVICE_FSPAMLIST_COM = 3;
+
+    const TYPE_MAIL = 'mail';
+    const TYPE_IP = 'ip';
 
     public function Init() {
         $this->oMapper = Engine::GetMapper( __CLASS__ );
@@ -61,8 +66,8 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         if (!is_array($aResult)) {
             return false;
         }
-        $bMail = (isset($aResult['mail']) ? $aResult['mail'] : false);
-        $bIp = (isset($aResult['ip']) ? $aResult['ip'] : false);
+        $bMail = (isset($aResult[self::TYPE_MAIL]) ? $aResult[self::TYPE_MAIL] : false);
+        $bIp = (isset($aResult[self::TYPE_IP]) ? $aResult[self::TYPE_IP] : false);
         if ($bCheckMail && !$bCheckIp) {
             return $bMail;
         } else if (!$bCheckMail && $bCheckIp) {
@@ -75,15 +80,22 @@ class PluginBlacklist_ModuleBlacklist extends Module {
     public function check_local_base($sMail, $sIp, $bCheckMail, $bCheckIp) {
         $aWhere = array();
         if ($bCheckMail) {
-            $aWhere['mail'] = $sMail;
+            $aWhere[self::TYPE_MAIL] = $sMail;
         }
         if ($bCheckIp) {
-            $aWhere['ip'] = $sIp;
+            $aWhere[self::TYPE_IP] = $sIp;
         }
         if (!$bCheckMail && !$bCheckIp) {
             return false;
         }
         $aInfo = $this->oMapper->Check($aWhere);
+
+        if (DEBUG) {
+            error_log('Local Base');
+            error_log(serialize($aWhere));
+            error_log(serialize($aInfo));
+        }
+        
         if ($aInfo) {
             $bMail = false;
             $bIp = false;
@@ -107,8 +119,8 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             }
  */
             return array(
-                'mail' => $bMail,
-                'ip' => $bIp,
+                self::TYPE_MAIL => $bMail,
+                self::TYPE_IP => $bIp,
             );
         }
         return false;
@@ -126,6 +138,13 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         }
         $sUrl = 'http://api.stopforumspam.org/api' . '?' . urldecode(http_build_query($aParams));
         $sAnswer = @file_get_contents($sUrl);
+        
+        if (DEBUG) {
+            error_log('stopforumspam.com');
+            error_log($sUrl);
+            error_log($sAnswer);
+        }
+        
         $aInfo = json_decode($sAnswer, true);
         if (isset($aInfo['success']) && $aInfo['success']) {
             $bMail = false;
@@ -141,8 +160,8 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                 }
             }
             return array(
-                'mail' => $bMail,
-                'ip' => $bIp,
+                self::TYPE_MAIL => $bMail,
+                self::TYPE_IP => $bIp,
             );
         }
         return false;
@@ -163,6 +182,13 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         }
         $sUrl = 'http://botscout.com/test/' . '?' . urldecode(http_build_query($aParams));
         $sAnswer = @file_get_contents($sUrl);
+        
+        if (DEBUG) {
+            error_log('botscout.com');
+            error_log($sUrl);
+            error_log($sAnswer);
+        }
+        
         if ($sAnswer) {
             $aAnswer = explode('|', $sAnswer);
             if (count($aAnswer) > 1 && $aAnswer[0] === 'Y') {
@@ -188,8 +214,8 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                     }
                 }
                 return array(
-                    'mail' => $bMail,
-                    'ip' => $bIp,
+                    self::TYPE_MAIL => $bMail,
+                    self::TYPE_IP => $bIp,
                 );
             }
         }
@@ -215,6 +241,13 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         }
         $sUrl = 'http://www.fspamlist.com/api.php' . '?' . urldecode(http_build_query($aParams));
         $sAnswer = @file_get_contents($sUrl);
+        
+        if (DEBUG) {
+            error_log('fspamlist.com');
+            error_log($sUrl);
+            error_log($sAnswer);
+        }
+        
         $aInfo = json_decode($sAnswer, true);
         if (count($aInfo)) {
             $bMail = false;
@@ -231,11 +264,19 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                 }
             }
             return array(
-                'mail' => $bMail,
-                'ip' => $bIp,
+                self::TYPE_MAIL => $bMail,
+                self::TYPE_IP => $bIp,
             );
         }
         return false;
+    }
+
+    public function AddMailResult($sMail, $bResult, $iService) {
+        $this->oMapper->AddResult(self::TYPE_MAIL, $sMail, $bResult, $iService);
+    }
+
+    public function AddIpResult($sIp, $bResult, $iService) {
+        $this->oMapper->AddResult(self::TYPE_IP, $sIp, $bResult, $iService);
     }
 
     public function blackMail($sMail, $sName = null) {
@@ -263,40 +304,41 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         }
         $bMail = false;
         $bIp = false;
+        $bResult = false;
         if (Config::Get('plugin.blacklist.use_stopforumspam_com')) {
             $aResult = $this->check_stopforumspam_com($sMail, $sIp, $bCheckMail, $bCheckIp);
-            $bMail |= (is_array($aResult) && isset($aResult['mail']) ? $aResult['mail'] : false);
-            $bIp |= (is_array($aResult) && isset($aResult['ip']) ? $aResult['ip'] : false);
+            $bMail |= (is_array($aResult) && isset($aResult[self::TYPE_MAIL]) ? $aResult[self::TYPE_MAIL] : false);
+            $bIp |= (is_array($aResult) && isset($aResult[self::TYPE_IP]) ? $aResult[self::TYPE_IP] : false);
             $bResult = $this->analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact);
             if ($bCheckMail) {
-                $this->oMapper->AddMailResult($sMail, $bMail, SERVICE_STOPFORUMSPAM_COM);
+                $this->AddMailResult($sMail, $bMail, self::SERVICE_STOPFORUMSPAM_COM);
             }
             if ($bCheckIp) {
-                $this->oMapper->AddIpResult($sIp, $bIp, SERVICE_STOPFORUMSPAM_COM);
+                $this->AddIpResult($sIp, $bIp, self::SERVICE_STOPFORUMSPAM_COM);
             }
         }
         if (!$bResult && Config::Get('plugin.blacklist.use_botscout_com')) {
             $aResult = $this->check_botscout_com($sMail, $sIp, $bCheckMail, $bCheckIp);
-            $bMail |= (is_array($aResult) && isset($aResult['mail']) ? $aResult['mail'] : false);
-            $bIp |= (is_array($aResult) && isset($aResult['ip']) ? $aResult['ip'] : false);
+            $bMail |= (is_array($aResult) && isset($aResult[self::TYPE_MAIL]) ? $aResult[self::TYPE_MAIL] : false);
+            $bIp |= (is_array($aResult) && isset($aResult[self::TYPE_IP]) ? $aResult[self::TYPE_IP] : false);
             $bResult = $this->analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact);
             if ($bCheckMail) {
-                $this->oMapper->AddMailResult($sMail, $bMail, SERVICE_BOTSCOUT_COM);
+                $this->AddMailResult($sMail, $bMail, self::SERVICE_BOTSCOUT_COM);
             }
             if ($bCheckIp) {
-                $this->oMapper->AddIpResult($sIp, $bIp, SERVICE_BOTSCOUT_COM);
+                $this->AddIpResult($sIp, $bIp, self::SERVICE_BOTSCOUT_COM);
             }
         }
         if (!$bResult && Config::Get('plugin.blacklist.use_fspamlist_com')) {
             $aResult = $this->check_fspamlist_com($sMail, $sIp, $bCheckMail, $bCheckIp);
-            $bMail |= (is_array($aResult) && isset($aResult['mail']) ? $aResult['mail'] : false);
-            $bIp |= (is_array($aResult) && isset($aResult['ip']) ? $aResult['ip'] : false);
+            $bMail |= (is_array($aResult) && isset($aResult[self::TYPE_MAIL]) ? $aResult[self::TYPE_MAIL] : false);
+            $bIp |= (is_array($aResult) && isset($aResult[self::TYPE_IP]) ? $aResult[self::TYPE_IP] : false);
             $bResult = $this->analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact);
             if ($bCheckMail) {
-                $this->oMapper->AddMailResult($sMail, $bMail, SERVICE_FSPAMLIST_COM);
+                $this->AddMailResult($sMail, $bMail, self::SERVICE_FSPAMLIST_COM);
             }
             if ($bCheckIp) {
-                $this->oMapper->AddIpResult($sIp, $bIp, SERVICE_FSPAMLIST_COM);
+                $this->AddIpResult($sIp, $bIp, self::SERVICE_FSPAMLIST_COM);
             }
         }
         return $bResult;
