@@ -62,7 +62,7 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             return false;
         }
         $bMail = (isset($aResult['mail']) ? $aResult['mail'] : false);
-        $bIp = (isset($aResult['mail']) ? $aResult['mail'] : false);
+        $bIp = (isset($aResult['ip']) ? $aResult['ip'] : false);
         if ($bCheckMail && !$bCheckIp) {
             return $bMail;
         } else if (!$bCheckMail && $bCheckIp) {
