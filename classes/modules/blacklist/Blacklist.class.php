@@ -9,7 +9,7 @@
  *
  **/
 
-define('DEBUG', true);
+define('DEBUG', false);
 
 class PluginBlacklist_ModuleBlacklist extends Module {
     protected $oMapper;
