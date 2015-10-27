@@ -2,7 +2,7 @@
 /**
  * Blacklist - проверка E-Mail пользователей на наличие в базах спамеров.
  *
- * Версия:	1.0.2
+ * Версия:	1.1.0
  * Автор:	Александр Вереник
  * Профиль:	http://livestreet.ru/profile/Wasja/
  * GitHub:	https://github.com/wasja1982/livestreet_blacklist
@@ -41,6 +41,12 @@ $config['key_fspamlist_com']='xxxxxxxxxxxxxxx';
 
 // Проверять e-mail и IP при авторизации
 $config['check_authorization']=true;
+
+// Белый список доменных зон (без точек)
+$config['whitelist_zones']=array();
+
+// Черный список доменных зон (без точек)
+$config['blacklist_zones']=array();
 
 // Белый список доменов
 $config['whitelist_domains']=array();

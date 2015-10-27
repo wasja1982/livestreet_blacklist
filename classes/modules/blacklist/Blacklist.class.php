@@ -2,14 +2,14 @@
 /**
  * Blacklist - проверка E-Mail пользователей на наличие в базах спамеров.
  *
- * Версия:	1.0.2
+ * Версия:	1.1.0
  * Автор:	Александр Вереник
  * Профиль:	http://livestreet.ru/profile/Wasja/
  * GitHub:	https://github.com/wasja1982/livestreet_blacklist
  *
  **/
 
-define('DEBUG', false);
+define('DEBUG', true);
 
 class PluginBlacklist_ModuleBlacklist extends Module {
     protected $oMapper;
@@ -28,38 +28,40 @@ class PluginBlacklist_ModuleBlacklist extends Module {
     public function check_whitelist_domains($sMail) {
         $aMail = explode("@", $sMail);
         $sDomain = (count($aMail) > 1 ? $aMail[1] : '');
-        return in_array(strtolower($sDomain), Config::Get('plugin.blacklist.whitelist_domains'));
+        $sZone = mb_substr(mb_strrchr($sDomain, "."), 1);
+        return in_array(mb_strtolower($sDomain), Config::Get('plugin.blacklist.whitelist_domains')) || in_array(mb_strtolower($sZone), Config::Get('plugin.blacklist.whitelist_zones'));
     }
 
     public function check_blacklist_domains($sMail) {
         $aMail = explode("@", $sMail);
         $sDomain = (count($aMail) > 1 ? $aMail[1] : '');
+        $sZone = mb_substr(mb_strrchr($sDomain, "."), 1);
         $aDomains = Config::Get('plugin.blacklist.blacklist_domains');
-        return (in_array('*', $aDomains) || in_array(strtolower($sDomain), $aDomains));
+        return (in_array('*', $aDomains) || in_array(mb_strtolower($sDomain), $aDomains) || in_array(mb_strtolower($sZone), Config::Get('plugin.blacklist.blacklist_zones')));
     }
 
     public function check_whitelist_users_mail($sMail) {
-        return in_array(strtolower($sMail), Config::Get('plugin.blacklist.whitelist_users_mail'));
+        return in_array(mb_strtolower($sMail), Config::Get('plugin.blacklist.whitelist_users_mail'));
     }
 
     public function check_whitelist_users_name($sName) {
-        return in_array(strtolower($sName), Config::Get('plugin.blacklist.whitelist_users_name'));
+        return in_array(mb_strtolower($sName), Config::Get('plugin.blacklist.whitelist_users_name'));
     }
 
     public function check_whitelist_users_ip($sIp) {
-        return in_array(strtolower($sIp), Config::Get('plugin.blacklist.whitelist_users_ip'));
+        return in_array(mb_strtolower($sIp), Config::Get('plugin.blacklist.whitelist_users_ip'));
     }
 
     public function check_blacklist_users_mail($sMail) {
-        return in_array(strtolower($sMail), Config::Get('plugin.blacklist.blacklist_users_mail'));
+        return in_array(mb_strtolower($sMail), Config::Get('plugin.blacklist.blacklist_users_mail'));
     }
 
     public function check_blacklist_users_name($sName) {
-        return in_array(strtolower($sName), Config::Get('plugin.blacklist.blacklist_users_name'));
+        return in_array(mb_strtolower($sName), Config::Get('plugin.blacklist.blacklist_users_name'));
     }
 
     public function check_blacklist_users_ip($sIp) {
-        return in_array(strtolower($sIp), Config::Get('plugin.blacklist.blacklist_users_ip'));
+        return in_array(mb_strtolower($sIp), Config::Get('plugin.blacklist.blacklist_users_ip'));
     }
 
     private function analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact) {
