@@ -97,14 +97,18 @@ class PluginBlacklist_ModuleBlacklist extends Module {
         }
         
         if ($aInfo) {
+            $bMailExist = false;
+            $bIpExist = false;
             $bMail = false;
             $bIp = false;
             foreach ($aInfo as $aItem) {
                 if (isset($aItem['content'])) {
                     if ($bCheckMail && $aItem['content'] == $sMail) {
                         $bMail |= ((isset($aItem['result']) && $aItem['result']) ? true : false);
+                        $bMailExist = true;
                     } elseif ($bCheckIp && $aItem['content'] == $sIp) {
                         $bIp |= ((isset($aItem['result']) && $aItem['result']) ? true : false);
+                        $bIpExist = true;
                     }
                 }
             }
@@ -118,10 +122,14 @@ class PluginBlacklist_ModuleBlacklist extends Module {
                 }
             }
  */
-            return array(
-                self::TYPE_MAIL => $bMail,
-                self::TYPE_IP => $bIp,
-            );
+            $bResult = array();
+            if ($bMailExist) {
+                $bResult[self::TYPE_MAIL] = $bMail;
+            }
+            if ($bIpExist) {
+                $bResult[self::TYPE_IP] = $bIp;
+            }
+            return $bResult;
         }
         return false;
     }
@@ -299,8 +307,14 @@ class PluginBlacklist_ModuleBlacklist extends Module {
             return false;
         }
         $bIpExact = Config::Get('plugin.blacklist.check_ip_exact');
-        if ($this->analyse_result($this->check_local_base($sMail, $sIp, $bCheckMail, $bCheckIp), $bCheckMail, $bCheckIp, $bIpExact)) {
-            return true;
+        $aResult = $this->check_local_base($sMail, $sIp, $bCheckMail, $bCheckIp);
+        if (is_array($aResult)) {
+            if ($this->analyse_result($aResult, $bCheckMail, $bCheckIp, $bIpExact)) {
+                return true;
+            } elseif ((!$bCheckMail || ($bCheckMail && isset($aResult[self::TYPE_MAIL]))) &&
+                      (!$bCheckIp || ($bCheckIp && isset($aResult[self::TYPE_IP])))) {
+                return false;
+            }
         }
         $bMail = false;
         $bIp = false;
