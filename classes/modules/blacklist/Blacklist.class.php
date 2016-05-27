@@ -28,16 +28,21 @@ class PluginBlacklist_ModuleBlacklist extends Module {
     public function check_whitelist_domains($sMail) {
         $aMail = explode("@", $sMail);
         $sDomain = (count($aMail) > 1 ? $aMail[1] : '');
-        $sZone = mb_substr(mb_strrchr($sDomain, "."), 1);
-        return in_array(mb_strtolower($sDomain), Config::Get('plugin.blacklist.whitelist_domains')) || in_array(mb_strtolower($sZone), Config::Get('plugin.blacklist.whitelist_zones'));
+        $aDomain = explode('.', $sDomain);
+        $sBaseDomain = count($aDomain) > 2 ? $aDomain[count($aDomain) - 2] . '.' . $aDomain[count($aDomain) - 1] : $sDomain;
+        $sZone = count($aDomain) > 1 ? $aDomain[count($aDomain) - 1] : $sDomain;
+        $aDomains = Config::Get('plugin.blacklist.whitelist_domains');
+        return in_array(mb_strtolower($sDomain), $aDomains) || in_array(mb_strtolower($sBaseDomain), $aDomains) || in_array(mb_strtolower($sZone), Config::Get('plugin.blacklist.whitelist_zones'));
     }
 
     public function check_blacklist_domains($sMail) {
         $aMail = explode("@", $sMail);
         $sDomain = (count($aMail) > 1 ? $aMail[1] : '');
-        $sZone = mb_substr(mb_strrchr($sDomain, "."), 1);
+        $aDomain = explode('.', $sDomain);
+        $sBaseDomain = count($aDomain) > 2 ? $aDomain[count($aDomain) - 2] . '.' . $aDomain[count($aDomain) - 1] : $sDomain;
+        $sZone = count($aDomain) > 1 ? $aDomain[count($aDomain) - 1] : $sDomain;
         $aDomains = Config::Get('plugin.blacklist.blacklist_domains');
-        return (in_array('*', $aDomains) || in_array(mb_strtolower($sDomain), $aDomains) || in_array(mb_strtolower($sZone), Config::Get('plugin.blacklist.blacklist_zones')));
+        return (in_array('*', $aDomains) || in_array(mb_strtolower($sDomain), $aDomains) || in_array(mb_strtolower($sBaseDomain), $aDomains) || in_array(mb_strtolower($sZone), Config::Get('plugin.blacklist.blacklist_zones')));
     }
 
     public function check_whitelist_users_mail($sMail) {
